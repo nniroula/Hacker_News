@@ -12,7 +12,7 @@ class Story {
    *   - {title, author, url, username, storyId, createdAt}
    */
 
-  constructor({ storyId, title, author, url, username, createdAt }) {
+  constructor({ storyId, title, author, url, username, createdAt }) {  // why is {} used in constructor
     this.storyId = storyId;
     this.title = title;
     this.author = author;
@@ -25,7 +25,8 @@ class Story {
 
   getHostName() {
     // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+    // return "hostname.com";
+    return new URL(this.url).host;
   }
 }
 
@@ -73,10 +74,56 @@ class StoryList {
    * Returns the new Story instance
    */
 
-  async addStory( /* user, newStory */) {
+  // part 2A
+//   async addStory( /* user, newStory */) {        // MY WORK HERE 2A
+    // async addStory( user, newStory ) {       // does not work right now
+    async addStory( user, {title, author, url} ) {   
     // UNIMPLEMENTED: complete this function!
+  // My version of the work
+        // let newStory = {title, author, url}
+        const token = user.loginToken;
+        const response = await axios({
+        url: `${BASE_URL}/stories`,
+        method: "POST",
+        // data: { token: currentUser.loginToken, story }
+        data: { token, newStory: {title, author, url} }
+        
+        });
+        let story_obj = new Story(response.data.newStory);
+        // this.stories.push(story_obj);
+        this.stories.unshift(story_obj);
+        // user.ownStories.unshift(story_obj);  // Not my idea
+
+        return story_obj;
+    }
+
+      /** Delete story from API and remove from the story lists.
+   *
+   * - user: the current User instance
+   * - storyId: the ID of the story you want to remove
+   */
+
+      // WORK ON THIS PART
+  async removeStory(user, storyId) {
+    const token = user.loginToken;
+    await axios({
+      url: `${BASE_URL}/stories/${storyId}`,
+      method: "DELETE",
+      data: { token: user.loginToken }
+    });
+
+    // filter out the story whose ID we are removing
+    this.stories = this.stories.filter(story => story.storyId !== storyId);
+
+    // do the same thing for the user's list of stories & their favorites
+    user.ownStories = user.ownStories.filter(s => s.storyId !== storyId);
+    user.favorites = user.favorites.filter(s => s.storyId !== storyId);
   }
 }
+
+  // above is my work
+
+// }
 
 
 /******************************************************************************
@@ -89,7 +136,7 @@ class User {
    *   - token
    */
 
-  constructor({
+  constructor({     // why is {} used in construtor signature
                 username,
                 name,
                 createdAt,
@@ -116,7 +163,7 @@ class User {
    * - name: the user's full name
    */
 
-  static async signup(username, password, name) {
+  static async signup(username, password, name) {  // why is static method
     const response = await axios({
       url: `${BASE_URL}/signup`,
       method: "POST",
@@ -143,7 +190,7 @@ class User {
    * - password: an existing user's password
    */
 
-  static async login(username, password) {
+  static async login(username, password) {  // why is no keyword function
     const response = await axios({
       url: `${BASE_URL}/login`,
       method: "POST",
@@ -168,29 +215,77 @@ class User {
    *   we can log them in automatically. This function does that.
    */
 
-  static async loginViaStoredCredentials(token, username) {
-    try {
-      const response = await axios({
-        url: `${BASE_URL}/users/${username}`,
-        method: "GET",
-        params: { token },
-      });
+    static async loginViaStoredCredentials(token, username) {
+        try {
+            const response = await axios({
+            url: `${BASE_URL}/users/${username}`,
+            method: "GET",
+            params: { token },
+        });
 
-      let { user } = response.data;
+        let { user } = response.data;
 
-      return new User(
+        return new User(
         {
-          username: user.username,
-          name: user.name,
-          createdAt: user.createdAt,
-          favorites: user.favorites,
-          ownStories: user.stories
+            username: user.username,
+            name: user.name,
+            createdAt: user.createdAt,
+            favorites: user.favorites,
+            ownStories: user.stories
         },
         token
-      );
-    } catch (err) {
-      console.error("loginViaStoredCredentials failed", err);
-      return null;
+        );
+        } catch (err) {
+            console.error("loginViaStoredCredentials failed", err);
+            return null;
+        }
     }
-  }
+//}
+
+
+// Underneath is my addition
+
+/** Add a story to the list of user favorites and update the API
+   * - story: a Story instance to add to favorites
+   */
+
+    async addFavorite(story) {
+        this.favorites.push(story);
+        await this._addOrRemoveFavorite("add", story)
+    }
+
+  /** Remove a story to the list of user favorites and update the API
+   * - story: the Story instance to remove from favorites
+   */
+
+    async removeFavorite(story) {
+        this.favorites = this.favorites.filter(s => s.storyId !== story.storyId);
+        await this._addOrRemoveFavorite("remove", story);
+    }
+
+  /** Update API with favorite/not-favorite.
+   *   - newState: "add" or "remove"
+   *   - story: Story instance to make favorite / not favorite
+   * */
+
+    async _addOrRemoveFavorite(newState, story) {
+        const method = newState === "add" ? "POST" : "DELETE";
+        const token = this.loginToken;
+        await axios({
+        url: `${BASE_URL}/users/${this.username}/favorites/${story.storyId}`,
+        method: method,
+        data: { token },
+        });
+    }
+
+  /** Return true/false if given Story instance is a favorite of this user. */
+
+    isFavorite(story) {
+        return this.favorites.some(s => (s.storyId === story.storyId));
+    }
 }
+
+// Above is my addition
+
+
+
