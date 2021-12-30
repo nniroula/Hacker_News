@@ -21,3 +21,8 @@ nav {
   margin-left: auto;
   text-align: right;
 }
+
+/* My addition below */
+.main-nav-links {
+    margin: 0 10px;
+  }

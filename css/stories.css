@@ -37,3 +37,22 @@
 .story-user {
   display: block;
 }
+
+/* Any thing below is my addition */
+/* this should go with list of stories */
+#favorited-stories,
+#my-stories {
+  list-style: none;
+  padding-left: 20px;
+}
+
+.star,
+.trash-can {
+  font-size: 0.75rem;
+  margin: 0 2px;
+  cursor: pointer;
+}
+
+.trash-can:hover {
+  color: crimson;
+}  
