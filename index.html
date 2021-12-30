@@ -36,7 +36,26 @@
 <nav>
   <div class="navbar-brand">
     <a class="nav-link" href="#" id="nav-all">Hack or Snooze</a>
+    <!-- <a href="#" id="nav-submit" class="nav-link">Sumbit</a> -->
+     <!--   <a href="#" id="nav-favorites" class="nav-link">Favorites</a>
+      <a href="#" id="nav-my-stories" class="nav-link">My Stories</a> 
+    -->
   </div>
+
+  <!-- My additio in a different div element -->
+  <div class="main-nav-links hidden">
+    |
+    <a class="nav-link" href="#" id="nav-submit-story">submit</a> 
+    |
+    <a class="nav-link" href="#" id="nav-favorites">favorites</a>
+    |
+    <!-- <a class="nav-link" href="#" id="nav-my-stories">my&nbsp;stories</a> -->
+    <a class="nav-link" href="#" id="nav-my-stories">user stories</a>
+  </div>
+
+
+  <!-- My addition above -->
+
   <div class="nav-right">
     <a class="nav-link" href="#" id="nav-login">login/signup</a>
     <a class="nav-link" href="#" id="nav-user-profile"></a>
@@ -95,6 +114,41 @@
     <button type="submit">create account</button>
   </form>
 </section>
+
+<!-- form for story new addition-->
+
+    <form action="" class="hidden" id="submit-form"> 
+        <label for="auth"> Author</label>
+        <input id="user" type="text" name='no author' placeholder="enter author name">
+
+        <label for="title">Title</label>
+        <input id="title" type="text" placeholder="title of story">
+
+        <label for='url'>URL</label>
+        <input id="url" type="text" placeholder="url for your story">
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+      <!-- List of stories favorited by the user my addition-->
+  <ol id="favorited-stories" class="hidden stories-list"></ol>
+
+  <!-- List of stories by the user my addition-->
+  <ol id="my-stories" class="hidden stories-list"></ol> 
+
+  <!-- User profile My addition-->
+<section id="user-profile" class="hidden">
+    <div class="user-profile-box container">
+      <h4>User Profile Info</h4>
+      <section>
+        <div>Name: <span id="profile-name">Name:</span></div>
+        <div>Username: <span id="profile-username">Username:</span></div>
+        <div>Account Created: <span id="profile-account-date"></span></div>
+      </section>
+    </div>
+  </section>
+
 
 <!-- Library JS & our JS -->
 <script src="https://unpkg.com/jquery"></script>
